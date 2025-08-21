@@ -9,7 +9,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/material/Container";
-import { getProducts } from "../utilities/api";
+import { deleteProduct, getProducts } from "../utilities/api_products";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -21,19 +21,66 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
+import Header from "../components/Header";
+import Swal from "sweetalert2";
+import { toast } from "sonner";
+import { AddToCart } from "../utilities/cart";
+import { useNavigate } from "react-router";
 
 export default function Products() {
-  // to store data from /movies API
+  const navigate = useNavigate();
+  // to store data from /products API
   const [products, setProducts] = useState([]);
-  // to store what genre to filter
+  // to track what page the user is in
+  const [page, setPage] = useState(1);
+  // to store what category to filter
   const [category, setCategory] = useState("All");
 
   useEffect(() => {
-    // get movies from API
-    getProducts(category).then((data) => {
+    // get products from API
+    getProducts(category, page).then((data) => {
       setProducts(data);
     });
-  }, [category]);
+  }, [category, page]);
+
+  const handleProductDelete = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it.",
+    }).then(async (result) => {
+      // once user delete, then we get the product
+      if (result.isConfirmed) {
+        // delete product via api
+        await deleteProduct(id);
+        // delete product from the state
+        // method 1
+        // delete manually from the state
+        // setProducts(products.filter((p) => p._id !== id));
+
+        // method 2
+        // get new data from backend
+        const updatedProducts = await getProducts(category, page);
+        setProducts(updatedProducts);
+        toast.success("Product has been deleted.");
+      }
+    });
+  };
+
+  const handleAddToCart = async (product, id) => {
+    try {
+      await AddToCart(product, id);
+      navigate("/cart");
+      toast.success("Product has been added to cart.");
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   return (
     <>
       <Box
@@ -43,20 +90,7 @@ export default function Products() {
         }}
       >
         {/* heaaaaaaaderr */}
-        <Box
-          sx={{
-            py: 3,
-            // mx: 2,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            borderBottom: "1px solid lightgrey",
-          }}
-        >
-          <Typography sx={{ fontWeight: "bold" }} variant="h4">
-            Welcome to My Store
-          </Typography>
-        </Box>
+        <Header title="Welcome To My Store" />
         <Box
           sx={{
             display: "flex",
@@ -74,6 +108,8 @@ export default function Products() {
               sx={{ textTransform: "none" }}
               color="success"
               variant="contained"
+              component={Link}
+              to="/products/new"
             >
               Add New
             </Button>
@@ -102,6 +138,8 @@ export default function Products() {
               label="Genre"
               onChange={(event) => {
                 setCategory(event.target.value);
+                // reset the page back to one
+                setPage(1);
               }}
             >
               <MenuItem value="All">All Categories</MenuItem>
@@ -126,7 +164,11 @@ export default function Products() {
                   <CardContent>
                     <Typography
                       gutterBottom
-                      sx={{ fontWeight: "bold", fontSize: 18 }}
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: 18,
+                        minHeight: "64px",
+                      }}
                     >
                       {product.name}
                     </Typography>
@@ -152,6 +194,9 @@ export default function Products() {
                       sx={{ width: "100%", textTransform: "none" }}
                       color="primary"
                       variant="contained"
+                      onClick={() => {
+                        handleAddToCart(product);
+                      }}
                     >
                       Add To Cart
                     </Button>
@@ -167,6 +212,8 @@ export default function Products() {
                         sx={{ textTransform: "none", borderRadius: "20px" }}
                         variant="contained"
                         size="small"
+                        component={Link}
+                        to={`/products/${product._id}/edit`}
                       >
                         Edit
                       </Button>
@@ -175,6 +222,9 @@ export default function Products() {
                         variant="contained"
                         size="small"
                         color="error"
+                        onClick={() => {
+                          handleProductDelete(product._id);
+                        }}
                       >
                         Delete
                       </Button>
@@ -185,32 +235,37 @@ export default function Products() {
             ))}
           </Grid>
         </Box>
-
-        {/* <TableContainer sx={{ marginBottom: 5 }} component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell align="right">Genre</TableCell>
-                <TableCell align="right">Rating</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {movies.map((movie) => (
-                <TableRow
-                  key={movie._id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="movie">
-                    {movie.title}
-                  </TableCell>
-                  <TableCell align="right">{movie.genre}</TableCell>
-                  <TableCell align="right">{movie.rating}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer> */}
+        {products.length === 0 ? (
+          <Typography variant="h5" align="center" py={3}>
+            No more products found.
+          </Typography>
+        ) : null}
+        <Box
+          sx={{
+            pt: 2,
+            pb: 2,
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            alignItems: "center",
+          }}
+        >
+          <Button
+            disabled={page === 1}
+            variant="contained"
+            onClick={() => setPage(page - 1)}
+          >
+            Previous
+          </Button>
+          <span>Page: {page}</span>
+          <Button
+            disabled={products.length === 0} // the button will be disabled if nomore product
+            variant="contained"
+            onClick={() => setPage(page + 1)}
+          >
+            Next
+          </Button>
+        </Box>
       </Box>
     </>
   );
