@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import { Link } from "react-router";
 
 const Header = (props) => {
+  const { current, title } = props;
   return (
     <Box
       sx={{
@@ -17,15 +18,33 @@ const Header = (props) => {
     >
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Typography sx={{ fontWeight: "bold" }} variant="h4">
-          {props.title}
+          {title}
         </Typography>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2, gap: 2 }}>
-        <Button component={Link} to="/" variant="outlined">
+        <Button
+          component={Link}
+          to="/"
+          variant={current === "home" ? "contained" : "outlined"}
+          // disabled={current === "checkout"}
+        >
           Home
         </Button>
-        <Button component={Link} to="/cart" variant="contained">
+        <Button
+          component={Link}
+          to="/cart"
+          variant={current === "cart" ? "contained" : "outlined"}
+          // disabled={current === "checkout"}
+        >
           Cart
+        </Button>
+        <Button
+          component={Link}
+          to="/orders"
+          variant={current === "orders" ? "contained" : "outlined"}
+          // disabled={current === "checkout"}
+        >
+          My Orders
         </Button>
       </Box>
     </Box>

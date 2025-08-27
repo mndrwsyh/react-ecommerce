@@ -71,14 +71,33 @@ export default function Products() {
     });
   };
 
-  const handleAddToCart = async (product, id) => {
+  const handleAddToCart = async (product) => {
     try {
-      await AddToCart(product, id);
-      navigate("/cart");
-      toast.success("Product has been added to cart.");
+      await AddToCart(product);
+      // navigate("/cart");
+      toast.success(`"${product.name}" has been added to cart.`);
     } catch (error) {
       toast.error(error.message);
     }
+  };
+
+  // sir's version in product page
+  const addToCart = (product) => {
+    // 1. get the current cart data from local storage
+    const cartInLocalStorage = localStorage.getItem("cart");
+    const cartData = cartInLocalStorage ? JSON.parse(cartInLocalStorage) : [];
+    // 2. find out if selected id product already exist or not
+    const selected = cartData.find((item) => item._id === product._id);
+    if (selected) {
+      selected.quantity += 1;
+      // 3. if product already exists, just inccrease quantity
+    } else {
+      // 4. if not exist, add product to cart
+      cartData.push({ ...product, quantity: 1 });
+    }
+
+    // update the cart in localstorage with latest data
+    localStorage.setItem("cart", JSON.parse(cartData));
   };
 
   return (
@@ -90,7 +109,7 @@ export default function Products() {
         }}
       >
         {/* heaaaaaaaderr */}
-        <Header title="Welcome To My Store" />
+        <Header current="home" title="Welcome To My Store" />
         <Box
           sx={{
             display: "flex",

@@ -2,9 +2,7 @@ import { getProduct } from "./api_products";
 
 // add product to cart
 export async function AddToCart(product) {
-  const cart = localStorage.getItem("cart")
-    ? JSON.parse(localStorage.getItem("cart"))
-    : [];
+  const cart = getCart();
   const existingProduct = cart.find((p) => p._id === product._id);
 
   if (existingProduct) {
@@ -17,16 +15,19 @@ export async function AddToCart(product) {
 }
 
 // get all items in the cart
-export function getCart() {}
+export function getCart() {
+  const cart = localStorage.getItem("cart")
+    ? JSON.parse(localStorage.getItem("cart"))
+    : [];
+  return cart;
+}
 
 // update the cart to local storage
 export function updateCart(cart) {}
 
 // delete item from the cart
 export function deleteItemFromCart(id) {
-  const cart = localStorage.getItem("cart")
-    ? JSON.parse(localStorage.getItem("cart"))
-    : [];
+  const cart = getCart();
   const updatedCart = cart.filter((p) => {
     if (p._id !== id) {
       return true;

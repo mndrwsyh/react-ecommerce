@@ -14,19 +14,22 @@ import { deleteProduct } from "../utilities/api_products";
 import { toast } from "sonner";
 import { deleteItemFromCart } from "../utilities/cart";
 import { useNavigate } from "react-router";
+import { getCart } from "../utilities/cart";
+import { Link } from "react-router";
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const productInCartLocalStorage = localStorage.getItem("cart");
-  const [productIncart, setProductIncart] = useState(
-    productInCartLocalStorage ? JSON.parse(productInCartLocalStorage) : []
-  );
+  // const productInCartLocalStorage = localStorage.getItem("cart");
+  const [productIncart, setProductIncart] = useState(getCart);
 
-  let total = 0;
-  productIncart.forEach((p) => {
-    total += p.price * p.quantity;
-  });
-  total = total.toFixed(2);
+  const getCartTotal = () => {
+    let total = 0;
+    productIncart.forEach((p) => {
+      total += p.price * p.quantity;
+    });
+    total = total.toFixed(2);
+    return total;
+  };
 
   if (!productIncart) {
     return (
@@ -44,7 +47,7 @@ const CartPage = () => {
     );
   }
 
-  const handleProductInCartDelete = (id) => {
+  const handleProductInCartDelete = (name, id) => {
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -57,9 +60,19 @@ const CartPage = () => {
       if (result.isConfirmed) {
         const updatedCart = await deleteItemFromCart(id);
         setProductIncart(updatedCart);
-        toast.success("Product has been removed from cart.");
+        toast.success(`"${name}" has been removed from cart.`);
       }
     });
+  };
+
+  // sir's version in cartpage
+  const removeItemFromCart = (product) => {
+    // 1. remove product from cart
+    const updatedCart = productIncart.filter(
+      (item) => item._id !== product._id
+    );
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    setProductIncart(updatedCart);
   };
 
   return (
@@ -70,7 +83,7 @@ const CartPage = () => {
           marginBottom: 3,
         }}
       >
-        <Header title="Cart" />
+        <Header current="cart" title="Cart" />
         <TableContainer sx={{ mt: 3 }} component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -104,7 +117,7 @@ const CartPage = () => {
                     <TableCell align="right">
                       <Button
                         onClick={() => {
-                          handleProductInCartDelete(p._id);
+                          handleProductInCartDelete(p.name, p._id);
                         }}
                         variant="contained"
                         color="error"
@@ -118,11 +131,8 @@ const CartPage = () => {
               <TableRow
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell component="th" scope="row"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right">${total}</TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell colSpan={3}></TableCell>
+                <TableCell align="right">${getCartTotal()}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -130,6 +140,9 @@ const CartPage = () => {
         <Button
           sx={{ display: "flex", justifyContent: "center", mt: 3 }}
           variant="contained"
+          component={Link}
+          to="/checkout"
+          disabled={productIncart.length === 0}
         >
           Checkout
         </Button>
