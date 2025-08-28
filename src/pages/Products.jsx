@@ -26,6 +26,9 @@ import Swal from "sweetalert2";
 import { toast } from "sonner";
 import { AddToCart } from "../utilities/cart";
 import { useNavigate } from "react-router";
+import { CardMedia } from "@mui/material";
+import { API_URL } from "../utilities/constants";
+import { getCategories } from "../utilities/api_categories";
 
 export default function Products() {
   const navigate = useNavigate();
@@ -35,6 +38,7 @@ export default function Products() {
   const [page, setPage] = useState(1);
   // to store what category to filter
   const [category, setCategory] = useState("All");
+  const [categories, setCategories] = useState(getCategories);
 
   useEffect(() => {
     // get products from API
@@ -162,10 +166,11 @@ export default function Products() {
               }}
             >
               <MenuItem value="All">All Categories</MenuItem>
-              <MenuItem value="Accessories">Accessories</MenuItem>
-              <MenuItem value="Games">Games</MenuItem>
-              <MenuItem value="Consoles">Consoles</MenuItem>
-              <MenuItem value="Subscriptions">Subscriptions</MenuItem>
+              {/* {categories.map((c) => (
+                <MenuItem key={c.id} value={c.label}>
+                  {c.label}
+                </MenuItem>
+              ))} */}
             </Select>
           </FormControl>
         </Box>
@@ -180,6 +185,16 @@ export default function Products() {
             {products.map((product) => (
               <Grid key={product._id} size={{ sm: 12, md: 6, lg: 4 }}>
                 <Card sx={{ padding: 1 }}>
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={
+                      API_URL +
+                      (product.image
+                        ? product.image
+                        : "uploads/default_image.jpg")
+                    }
+                  />
                   <CardContent>
                     <Typography
                       gutterBottom
@@ -187,13 +202,14 @@ export default function Products() {
                         fontWeight: "bold",
                         fontSize: 18,
                         minHeight: "64px",
+                        mb: 0,
                       }}
                     >
                       {product.name}
                     </Typography>
                     <Box
                       sx={{
-                        my: 2,
+                        mb: 2,
                         display: "flex",
                         justifyContent: "space-between",
                       }}

@@ -16,10 +16,12 @@ import MenuItem from "@mui/material/MenuItem";
 import { updateOrder } from "../utilities/api_orders";
 import { deleteOrder } from "../utilities/api_orders";
 import { toast } from "sonner";
+import dayjs from "dayjs";
 
 const OrdersPage = () => {
   // store orders data from api
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // call the api
   useEffect(() => {
@@ -115,12 +117,11 @@ const OrdersPage = () => {
                         defaultValue={o.status}
                         onChange={async (event) => {
                           await updateOrder(o._id, event.target.value);
+
+                          toast.info("Status has been updated.");
                         }}
                       >
-                        <MenuItem
-                          disabled={o.status !== "pending"}
-                          value="pending"
-                        >
+                        <MenuItem disabled value="pending">
                           Pending
                         </MenuItem>
                         <MenuItem value="paid">Paid</MenuItem>
@@ -128,7 +129,10 @@ const OrdersPage = () => {
                         <MenuItem value="completed">Completed</MenuItem>
                       </Select>
                     </TableCell>
-                    <TableCell align="left">{o.paid_at}</TableCell>
+                    <TableCell align="left">
+                      {o.status === "paid" &&
+                        dayjs(o.paid_at).format("dddd, DD/MM/YYYY")}
+                    </TableCell>
                     <TableCell align="left">
                       <Button
                         onClick={() => {
@@ -146,12 +150,6 @@ const OrdersPage = () => {
                   </TableRow>
                 ))
               )}
-              <TableRow
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell colSpan={3}></TableCell>
-                <TableCell align="right"></TableCell>
-              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

@@ -12,6 +12,22 @@ import MenuItem from "@mui/material/MenuItem";
 import { Toaster, toast } from "sonner";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router";
+import { styled } from "@mui/material/styles";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { uploadImage } from "../utilities/api_image";
+import { API_URL } from "../utilities/constants";
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const ProductAdd = () => {
   const navigate = useNavigate();
@@ -19,6 +35,7 @@ const ProductAdd = () => {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
   const [category, setCategory] = useState("");
+  const [image, setImage] = useState(null);
 
   const handleFormSubmit = async (event) => {
     // event.preventDefault();
@@ -29,7 +46,7 @@ const ProductAdd = () => {
 
     try {
       // 2. trigger the api to create new product
-      await addProduct(name, description, price, category);
+      await addProduct(name, description, price, category, image);
 
       // 3. if successfull, redirect user back to homepage and show success message
       navigate("/");
@@ -103,6 +120,43 @@ const ProductAdd = () => {
               <MenuItem value="Subscriptions">Subscriptions</MenuItem>
             </Select>
           </FormControl>
+        </Box>
+        <Box mb={2} sx={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {image ? (
+            <>
+              <img src={API_URL + image} width="150px" />
+              <Button
+                color="info"
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  setImage(null);
+                }}
+              >
+                Remove
+              </Button>
+            </>
+          ) : (
+            <Button
+              component="label"
+              role={undefined}
+              variant="contained"
+              tabIndex={-1}
+              startIcon={<CloudUploadIcon />}
+            >
+              Upload image
+              <VisuallyHiddenInput
+                type="file"
+                onChange={async (event) => {
+                  const data = await uploadImage(event.target.files[0]);
+                  // {image_url : "uploads/image.jpg"}
+                  // set image url into state
+                  setImage(data.image_url);
+                }}
+                accept="image/*"
+              />
+            </Button>
+          )}
         </Box>
         <Box mb={2}>
           <Button variant="contained" fullWidth onClick={handleFormSubmit}>

@@ -46,6 +46,14 @@ const Header = (props) => {
         >
           My Orders
         </Button>
+        <Button
+          component={Link}
+          to="/categories"
+          variant={current === "categories" ? "contained" : "outlined"}
+          // disabled={current === "checkout"}
+        >
+          Categories
+        </Button>
       </Box>
     </Box>
   );
