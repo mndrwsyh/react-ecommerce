@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_URL } from "./constants";
 
-export async function getCategories(category, page = 1) {
+export async function getCategories(category) {
   const response = await axios.get(API_URL + "categories");
   return response.data;
 }

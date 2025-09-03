@@ -38,7 +38,7 @@ export default function Products() {
   const [page, setPage] = useState(1);
   // to store what category to filter
   const [category, setCategory] = useState("All");
-  const [categories, setCategories] = useState(getCategories);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     // get products from API
@@ -46,6 +46,16 @@ export default function Products() {
       setProducts(data);
     });
   }, [category, page]);
+
+  useEffect(() => {
+    getCategories()
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   const handleProductDelete = (id) => {
     Swal.fire({
@@ -166,11 +176,9 @@ export default function Products() {
               }}
             >
               <MenuItem value="All">All Categories</MenuItem>
-              {/* {categories.map((c) => (
-                <MenuItem key={c.id} value={c.label}>
-                  {c.label}
-                </MenuItem>
-              ))} */}
+              {categories.map((c) => (
+                <MenuItem value={c._id}>{c.label}</MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
@@ -222,7 +230,7 @@ export default function Products() {
                       <Chip
                         variant="outlined"
                         color="warning"
-                        label={product.category}
+                        label={product.category ? product.category.label : ""}
                       />
                     </Box>
                     <Button

@@ -17,6 +17,7 @@ import { styled } from "@mui/material/styles";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { uploadImage } from "../utilities/api_image";
 import { API_URL } from "../utilities/constants";
+import { getCategories } from "../utilities/api_categories";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -39,6 +40,7 @@ const ProductEdit = () => {
   const [category, setCategory] = useState("");
   const [error, setError] = useState(null);
   const [image, setImage] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   // load the product data from the backend api and assign it to the state
   useEffect(() => {
@@ -62,6 +64,16 @@ const ProductEdit = () => {
         setError("Product not Found");
       });
   }, [id]);
+
+  useEffect(() => {
+    getCategories()
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   const handleFormSubmit = async (event) => {
     // event.preventDefault();
@@ -154,11 +166,9 @@ const ProductEdit = () => {
                 // setPage(1);
               }}
             >
-              <MenuItem value="All">All Categories</MenuItem>
-              <MenuItem value="Accessories">Accessories</MenuItem>
-              <MenuItem value="Games">Games</MenuItem>
-              <MenuItem value="Consoles">Consoles</MenuItem>
-              <MenuItem value="Subscriptions">Subscriptions</MenuItem>
+              {categories.map((c) => (
+                <MenuItem value={c._id}>{c.label}</MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>

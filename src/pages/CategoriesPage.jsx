@@ -23,9 +23,12 @@ import {
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import { getProducts } from "../utilities/api_products";
 
 const CategoriesPage = () => {
   const navigate = useNavigate();
+
+  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [label, setLabel] = useState("");
 
@@ -67,7 +70,7 @@ const CategoriesPage = () => {
       cancelButtonColor: "#d33",
       confirmButtonText: "Update",
       input: "text",
-      inputPlaceholder: `${label}`,
+      inputValue: `${label}`,
       showCancelButton: true,
       preConfirm: (value) => {
         if (!value) {
@@ -156,8 +159,8 @@ const CategoriesPage = () => {
             <InputLabel>Existing Categories ({categories.length})</InputLabel>
             <List sx={{ width: "100%" }}>
               {categories.map((category) => {
-                // const courseInGroup = groups.some((g) =>
-                //   g.selectedCourse.includes(course.id)
+                // const usedCategory = products.some((p) =>
+                //   p.category.includes(category._label)
                 // );
                 return (
                   <ListItem
@@ -179,6 +182,7 @@ const CategoriesPage = () => {
 
                         <Button
                           sx={{ textTransform: "none" }}
+                          //   disabled={usedCategory}
                           variant="contained"
                           color="error"
                           onClick={() => {
