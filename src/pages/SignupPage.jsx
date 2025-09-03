@@ -66,6 +66,7 @@ const SignupPage = () => {
             <Box mb={2} mt={1}>
               <TextField
                 fullWidth
+                type="password"
                 label="Password"
                 variant="outlined"
                 value={password}
@@ -76,6 +77,7 @@ const SignupPage = () => {
             <Box mb={2} mt={1}>
               <TextField
                 fullWidth
+                type="password"
                 label="Confirm Password"
                 variant="outlined"
                 value={confirmPassword}

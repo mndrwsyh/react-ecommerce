@@ -52,6 +52,7 @@ const LoginPage = () => {
             <Box mb={2} mt={1}>
               <TextField
                 fullWidth
+                type="password"
                 label="Password"
                 variant="outlined"
                 value={password}
