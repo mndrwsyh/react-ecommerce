@@ -18,13 +18,17 @@ import validator from "email-validator";
 import { createOrder } from "../utilities/api_orders";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useCookies } from "react-cookie";
 
 const CheckoutPage = () => {
+  const [cookies] = useCookies(["currentuser"]);
+  const { currentuser = {} } = cookies; // assign empty object to avoid error
+  const { token = "", email = "", name = "" } = currentuser;
   //   const navigate = useNavigate();
   // const productInCartLocalStorage = localStorage.getItem("cart");
   const [productIncart, setProductIncart] = useState(getCart);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // const [name, setName] = useState(currentuser.name);
+  // const [email, setEmail] = useState(currentuser.email);
   const [loading, setLoading] = useState(false);
 
   const getCartTotal = () => {
@@ -89,7 +93,7 @@ const CheckoutPage = () => {
                 label="Name"
                 variant="outlined"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                // onChange={(e) => setName(e.target.value)}
               ></TextField>
             </Box>
             <Box mb={2}>
@@ -98,7 +102,7 @@ const CheckoutPage = () => {
                 label="Email"
                 variant="outlined"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                // onChange={(e) => setEmail(e.target.value)}
               ></TextField>
             </Box>
             <Box mb={2}>

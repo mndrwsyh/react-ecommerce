@@ -35,6 +35,8 @@ export default function Products() {
   const navigate = useNavigate();
 
   const [cookies, setCookie, removeCookie] = useCookies(["currentuser"]);
+  const { currentuser = {} } = cookies; // assign empty object to avoid error
+  const { token = "" } = currentuser;
   // to store data from /products API
   const [products, setProducts] = useState([]);
   // to track what page the user is in
@@ -73,7 +75,7 @@ export default function Products() {
       // once user delete, then we get the product
       if (result.isConfirmed) {
         // delete product via api
-        await deleteProduct(id);
+        await deleteProduct(id, token);
         // delete product from the state
         // method 1
         // delete manually from the state
@@ -139,17 +141,19 @@ export default function Products() {
           <Typography sx={{ fontWeight: "bold" }} variant="h5">
             Products
           </Typography>
-          <Box sx={{ display: "flex", gap: "10px" }}>
-            <Button
-              sx={{ textTransform: "none" }}
-              color="success"
-              variant="contained"
-              component={Link}
-              to="/products/new"
-            >
-              Add New
-            </Button>
-          </Box>
+          {currentuser.role === "admin" && (
+            <Box sx={{ display: "flex", gap: "10px" }}>
+              <Button
+                sx={{ textTransform: "none" }}
+                color="success"
+                variant="contained"
+                component={Link}
+                to="/products/new"
+              >
+                Add New
+              </Button>
+            </Box>
+          )}
         </Box>
 
         <Box
@@ -246,35 +250,37 @@ export default function Products() {
                     >
                       Add To Cart
                     </Button>
-                    <Box
-                      sx={{
-                        width: "100%",
-                        paddingTop: 2,
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Button
-                        sx={{ textTransform: "none", borderRadius: "20px" }}
-                        variant="contained"
-                        size="small"
-                        component={Link}
-                        to={`/products/${product._id}/edit`}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        sx={{ textTransform: "none", borderRadius: "20px" }}
-                        variant="contained"
-                        size="small"
-                        color="error"
-                        onClick={() => {
-                          handleProductDelete(product._id);
+                    {currentuser.role === "admin" && (
+                      <Box
+                        sx={{
+                          width: "100%",
+                          paddingTop: 2,
+                          display: "flex",
+                          justifyContent: "space-between",
                         }}
                       >
-                        Delete
-                      </Button>
-                    </Box>
+                        <Button
+                          sx={{ textTransform: "none", borderRadius: "20px" }}
+                          variant="contained"
+                          size="small"
+                          component={Link}
+                          to={`/products/${product._id}/edit`}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          sx={{ textTransform: "none", borderRadius: "20px" }}
+                          variant="contained"
+                          size="small"
+                          color="error"
+                          onClick={() => {
+                            handleProductDelete(product._id);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    )}
                   </CardContent>
                 </Card>
               </Grid>

@@ -29,12 +29,13 @@ const SignupPage = () => {
         const signUpData = await signup(name, email, password);
         console.log(signUpData);
         // set cookies
-        setCookie("currentuser", loginData, {
+        setCookie("currentuser", signUpData, {
           maxAge: 60 * 60 * 8, // expires in 8 hours
         });
         toast.success("Successfully created a new account!");
         navigate("/");
       } catch (error) {
+        console.log(error);
         toast.error("Invalid Email or Password.");
       }
     }

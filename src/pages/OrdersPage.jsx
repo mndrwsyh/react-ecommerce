@@ -17,22 +17,27 @@ import { updateOrder } from "../utilities/api_orders";
 import { deleteOrder } from "../utilities/api_orders";
 import { toast } from "sonner";
 import dayjs from "dayjs";
+import { useCookies } from "react-cookie";
 
 const OrdersPage = () => {
   // store orders data from api
+
+  const [cookies] = useCookies(["currentuser"]);
+  const { currentuser = {} } = cookies; // assign empty object to avoid error
+  const { token = "" } = currentuser;
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // call the api
   useEffect(() => {
-    getOrders()
+    getOrders(token)
       .then((data) => {
         setOrders(data);
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []); // call only once when the page load
+  }, [token]); // call only once when the page load
 
   console.log(orders);
 
@@ -49,7 +54,7 @@ const OrdersPage = () => {
       // once user delete, then we get the product
       if (result.isConfirmed) {
         // delete product via api
-        await deleteOrder(id);
+        await deleteOrder(id, token);
         // delete product from the state
         // method 1
         // delete manually from the state
@@ -111,12 +116,14 @@ const OrdersPage = () => {
                     <TableCell align="left">
                       <Select
                         sx={{ minWidth: "200px" }}
-                        disabled={o.status === "pending"}
+                        disabled={
+                          o.status === "pending" || currentuser.role === "user"
+                        }
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
                         defaultValue={o.status}
                         onChange={async (event) => {
-                          await updateOrder(o._id, event.target.value);
+                          await updateOrder(o._id, event.target.value, token);
 
                           toast.info("Status has been updated.");
                         }}
@@ -134,18 +141,18 @@ const OrdersPage = () => {
                         dayjs(o.paid_at).format("dddd, DD/MM/YYYY")}
                     </TableCell>
                     <TableCell align="left">
-                      <Button
-                        onClick={() => {
-                          handleDeleteOrder(o._id);
-                        }}
-                        variant="outlined"
-                        color="error"
-                        sx={{
-                          display: o.status === "pending" ? "block" : "none",
-                        }}
-                      >
-                        Delete
-                      </Button>
+                      {o.status === "pending" &&
+                        currentuser.role === "admin" && (
+                          <Button
+                            onClick={() => {
+                              handleDeleteOrder(o._id);
+                            }}
+                            variant="outlined"
+                            color="error"
+                          >
+                            Delete
+                          </Button>
+                        )}
                     </TableCell>
                   </TableRow>
                 ))

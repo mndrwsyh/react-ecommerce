@@ -113,7 +113,9 @@ const CartPage = () => {
                     </TableCell>
                     <TableCell align="right">${p.price}</TableCell>
                     <TableCell align="right">{p.quantity}</TableCell>
-                    <TableCell align="right">${p.price * p.quantity}</TableCell>
+                    <TableCell align="right">
+                      ${(p.price * p.quantity).toFixed(2)}
+                    </TableCell>
                     <TableCell align="right">
                       <Button
                         onClick={() => {

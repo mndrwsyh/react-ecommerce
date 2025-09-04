@@ -32,8 +32,8 @@ const Header = (props) => {
           {title}
         </Typography>
         {currentuser && (
-          <Typography sx={{ fontWeight: "bold", mt: 1 }} variant="h6">
-            Hello, {currentuser.name}!
+          <Typography sx={{ mt: 0 }} variant="h6">
+            Hello, {currentuser.name}!<br /> ({currentuser.email})
           </Typography>
         )}
       </Box>
