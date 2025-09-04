@@ -29,9 +29,12 @@ import { useNavigate } from "react-router";
 import { CardMedia } from "@mui/material";
 import { API_URL } from "../utilities/constants";
 import { getCategories } from "../utilities/api_categories";
+import { useCookies } from "react-cookie";
 
 export default function Products() {
   const navigate = useNavigate();
+
+  const [cookies, setCookie, removeCookie] = useCookies(["currentuser"]);
   // to store data from /products API
   const [products, setProducts] = useState([]);
   // to track what page the user is in

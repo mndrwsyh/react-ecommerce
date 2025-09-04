@@ -10,10 +10,11 @@ import OrdersPage from "./pages/OrdersPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import { CookiesProvider } from "react-cookie";
 
 function App() {
   return (
-    <div className="App">
+    <CookiesProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Products />} />
@@ -29,7 +30,7 @@ function App() {
         </Routes>
         <Toaster />
       </BrowserRouter>
-    </div>
+    </CookiesProvider>
   );
 }
 

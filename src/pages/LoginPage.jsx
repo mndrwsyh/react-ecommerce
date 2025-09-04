@@ -5,8 +5,12 @@ import { login } from "../utilities/api_users";
 import { useState } from "react";
 import { toast } from "sonner";
 import validator from "email-validator";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(["currentuser"]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -20,7 +24,12 @@ const LoginPage = () => {
       try {
         const loginData = await login(email, password);
         console.log(loginData);
+        // set cookies
+        setCookie("currentuser", loginData, {
+          maxAge: 60 * 60 * 8, // expires in 8 hours
+        });
         toast.success("Successfully logged in!");
+        navigate("/");
       } catch (error) {
         toast.error("Invalid Email or Password.");
       }

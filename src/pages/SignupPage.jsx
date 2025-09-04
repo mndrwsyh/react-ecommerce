@@ -4,10 +4,13 @@ import { Card, TextField, Button, Container, Typography } from "@mui/material";
 import { signup } from "../utilities/api_users";
 import { useState } from "react";
 import { toast } from "sonner";
-
+import { useCookies } from "react-cookie";
 import validator from "email-validator";
+import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
+  const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(["currentuser"]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +28,12 @@ const SignupPage = () => {
       try {
         const signUpData = await signup(name, email, password);
         console.log(signUpData);
+        // set cookies
+        setCookie("currentuser", loginData, {
+          maxAge: 60 * 60 * 8, // expires in 8 hours
+        });
         toast.success("Successfully created a new account!");
+        navigate("/");
       } catch (error) {
         toast.error("Invalid Email or Password.");
       }

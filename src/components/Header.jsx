@@ -2,9 +2,14 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { Link } from "react-router";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router";
 
 const Header = (props) => {
+  const navigate = useNavigate();
+  const [cookies, setCookie, removeCookie] = useCookies(["currentuser"]);
   const { current, title } = props;
+  const { currentuser } = cookies;
   return (
     <Box
       sx={{
@@ -16,10 +21,21 @@ const Header = (props) => {
         borderBottom: "1px solid lightgrey",
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <Box
+        sx={{
+          display: "flex-column",
+          justifyContent: "center",
+          textAlign: "center",
+        }}
+      >
         <Typography sx={{ fontWeight: "bold" }} variant="h4">
           {title}
         </Typography>
+        {currentuser && (
+          <Typography sx={{ fontWeight: "bold", mt: 1 }} variant="h6">
+            Hello, {currentuser.name}!
+          </Typography>
+        )}
       </Box>
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2, gap: 2 }}>
         <Button
@@ -54,22 +70,38 @@ const Header = (props) => {
         >
           Categories
         </Button>
-        <Button
-          component={Link}
-          to="/login"
-          variant={current === "login" ? "contained" : "outlined"}
-          // disabled={current === "checkout"}
-        >
-          Login
-        </Button>
-        <Button
-          component={Link}
-          to="/signup"
-          variant={current === "signup" ? "contained" : "outlined"}
-          // disabled={current === "checkout"}
-        >
-          Signup
-        </Button>
+        {currentuser ? (
+          <>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                removeCookie("currentuser");
+                navigate("/");
+              }}
+            >
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              component={Link}
+              to="/login"
+              variant={current === "login" ? "contained" : "outlined"}
+              // disabled={current === "checkout"}
+            >
+              Login
+            </Button>
+            <Button
+              component={Link}
+              to="/signup"
+              variant={current === "signup" ? "contained" : "outlined"}
+              // disabled={current === "checkout"}
+            >
+              Signup
+            </Button>
+          </>
+        )}
       </Box>
     </Box>
   );
